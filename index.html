@@ -21,16 +21,22 @@
 
 					@vue:mounted="onMounted"
 					@vue:unmounted="onUnmounted"
+					@touchstart.prevent="onRootTouchStart"
 
 					ref="root"
 					class="size-full relative"
 				>
-					<button
+					<div
+						ref="touch"
+						class="bg-neutral/50 absolute -translate-1/2 rounded-full z-1"
+					>
+					</div>
+					<div
 						ref="target"
 						@click.prevent="onTargetClicked"
-						class="btn btn-square btn-primary btn-sm absolute"
+						class="btn btn-square btn-primary btn-sm absolute rounded-full"
 					>
-					</button>
+					</div>
 				</section>
 			</main>
 		</div>

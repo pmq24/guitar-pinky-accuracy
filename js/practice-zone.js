@@ -22,15 +22,19 @@ function getMountElement(id) {
 
 function createComponent() {
 	const options = {
-
+		// States
 		targetGeneratorId: null,
 		target: null,
-
+		
+		// Lifecycle hooks
 		onMounted,
 		onUnmounted,
 
+		// Methods
+		onRootTouchStart,
 		onTargetClicked,
 
+		// Helpers
 		clientHeight() {
 			return this.root().clientHeight
 		},
@@ -42,6 +46,9 @@ function createComponent() {
 		},
 		target() {
 			return this.$refs.target
+		},
+		touch() {
+			return this.$refs.touch	
 		}
 	}
 
@@ -65,6 +72,27 @@ function onUnmounted() {
 	if (this.targetGeneratorId) {
 		clearInterval(this.targetGeneratorId)
 	}
+}
+
+function onRootTouchStart(e) {
+	if (!(e instanceof TouchEvent)) {
+		throw new Error("A TouchEvent handler is bound to non-touch event")
+	}
+
+	const touchData = e.touches[0]
+
+	const touch = this.touch()
+	const root = this.root()
+	const rootBoundingClientRect = root.getBoundingClientRect()
+
+	const viewportLeftDifference = rootBoundingClientRect.left
+  touch.style.left = touchData.clientX - viewportLeftDifference + "px"
+
+	const viewportTopDifference = rootBoundingClientRect.top
+	touch.style.top = touchData.clientY - viewportTopDifference + "px"
+
+	touch.style.height = touchData.radiusX + "px"
+	touch.style.width = touchData.radiusY + "px"
 }
 
 function onTargetClicked() {
