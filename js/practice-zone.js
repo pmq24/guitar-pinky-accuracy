@@ -91,8 +91,8 @@ function onRootTouchStart(e) {
 	const viewportTopDifference = rootBoundingClientRect.top
 	touch.style.top = touchData.clientY - viewportTopDifference + "px"
 
-	touch.style.height = touchData.radiusX + "px"
-	touch.style.width = touchData.radiusY + "px"
+	touch.style.height = touchData.radiusX * 50 + "px"
+	touch.style.width = touchData.radiusY * 50 + "px"
 }
 
 function onTargetClicked() {
