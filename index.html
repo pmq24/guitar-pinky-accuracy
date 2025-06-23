@@ -37,6 +37,34 @@
 						class="btn btn-square btn-primary btn-sm absolute rounded-full"
 					>
 					</div>
+
+					<section class="absolute bottom-0 left-0 right-0">
+						Total: {{ totalTargets() }}
+						<br />
+						Fretted: {{ frettedTargets() }}
+						<br />
+						Distance:
+						<span :class="lastDistance() > 15 ? 'text-error' : 'text-success'">
+							last {{ lastDistance() }}
+						</span>,
+						<span :class="averageDistance() > 15 ? 'text-error' : 'text-success'">
+							avg {{ averageDistance() }}
+						</span>
+						<br />
+						(Good: 15 or less)
+						<br />
+						Area: 
+						<span :class="lastArea() > 30 ? 'text-error' : 'text-success'">
+							last {{ lastArea() }}
+						</span>,
+						<span :class="averageArea() > 30 ? 'text-error' : 'text-success'">
+							avg {{ averageArea() }}
+						</span>
+						<br />
+						(Good: 30 or less)
+						<br />
+						Missed: {{ missedTargets() }}
+					</section>
 				</section>
 			</main>
 		</div>

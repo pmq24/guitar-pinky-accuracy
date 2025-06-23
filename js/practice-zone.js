@@ -25,6 +25,11 @@ function createComponent() {
 		// States
 		targetGeneratorId: null,
 		target: null,
+		fretted: "not fretted",
+		metrics: {
+			fretted: [],
+			missed: 0
+		},
 		
 		// Lifecycle hooks
 		onMounted,
@@ -49,6 +54,42 @@ function createComponent() {
 		},
 		touch() {
 			return this.$refs.touch	
+		},
+		
+		// Metrics presentation
+		totalTargets() {
+			return this.metrics.fretted.length + this.metrics.missed
+		},
+
+		// Metrics calculations
+		frettedTargets() {
+			return this.metrics.fretted.length
+		},
+		
+		averageDistance() {
+			if (this.metrics.fretted.length === 0) return 0
+			const sum = this.metrics.fretted.reduce((acc, item) => acc + item.distance, 0)
+			return (sum / this.metrics.fretted.length).toFixed(2)
+		},
+		
+		averageArea() {
+			if (this.metrics.fretted.length === 0) return 0
+			const sum = this.metrics.fretted.reduce((acc, item) => acc + item.area, 0)
+			return (sum / this.metrics.fretted.length).toFixed(2)
+		},
+		
+		lastDistance() {
+			if (this.metrics.fretted.length === 0) return 0
+			return this.metrics.fretted.at(-1).distance.toFixed(2)
+		},
+		
+		lastArea() {
+			if (this.metrics.fretted.length === 0) return 0
+			return this.metrics.fretted.at(-1).area.toFixed(2)
+		},
+		
+		missedTargets() {
+			return this.metrics.missed
 		}
 	}
 
@@ -57,6 +98,7 @@ function createComponent() {
 
 function onMounted() {
 	this.targetGeneratorId = setInterval(() => {
+
 		const x = Math.random() * this.clientWidth()
 		const y = Math.random() * this.clientHeight()
 
@@ -64,7 +106,11 @@ function onMounted() {
 
 		target.style.left = x + "px"
     target.style.top = y + "px"
-		target.disabled = false
+		if (this.fretted === "not fretted") {
+			this.metrics.missed++
+		} else {
+			this.fretted = "not fretted"
+		}
 	}, 2000)
 }
 
@@ -77,6 +123,10 @@ function onUnmounted() {
 function onRootTouchStart(e) {
 	if (!(e instanceof TouchEvent)) {
 		throw new Error("A TouchEvent handler is bound to non-touch event")
+	}
+
+	if (this.fretted !== "not fretted") {
+		return
 	}
 
 	const touchData = e.touches[0]
@@ -93,6 +143,32 @@ function onRootTouchStart(e) {
 
 	touch.style.height = touchData.radiusX * 50 + "px"
 	touch.style.width = touchData.radiusY * 50 + "px"
+	
+	this.fretted = true
+	const target = this.target()
+
+	const targetRect = target.getBoundingClientRect()
+	const targetCenterX = targetRect.left + targetRect.width / 2
+	const targetCenterY = targetRect.top + targetRect.height / 2
+	
+	const touchX = touchData.clientX
+	const touchY = touchData.clientY
+	
+	const distance = Math.sqrt(
+		Math.pow(touchX - targetCenterX, 2) + 
+		Math.pow(touchY - targetCenterY, 2)
+	)
+
+	if (distance <= 15) {
+		this.metrics.fretted.push({
+			distance,
+			area: touchData.radiusX * touchData.radiusY * 250
+		})
+		this.fretted = "fretted"
+	} else {
+		this.metrics.missed++
+		this.fretted = "missed"
+	}
 }
 
 function onTargetClicked() {
